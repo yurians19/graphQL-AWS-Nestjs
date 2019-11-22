@@ -6,6 +6,7 @@ export class AppService {
   private readonly snsClient: SNS;
   private readonly sesClient: SES;
   private readonly s3Client:  S3;
+  private readonly bucket: string = 'dreamcode-cmk-98-bucket';
 
   constructor() {
     const config: object = {
@@ -20,42 +21,43 @@ export class AppService {
   }
 
   async uploadS3(key:string,message:string): Promise<any> {
-    var params = {Bucket: 'bucket', Key: key, Body: message};
+    var params = {Bucket: this.bucket, Key: key, Body: message};
     try {
-      await this.s3Client.upload(params);
-      return 'successful';
+      const res = await this.s3Client.upload(params).promise();
+      return res.Key;
     } catch (error) {
-      return 'error';
+      return error.toString();
     }
   }
 
   async getObjectS3(key:string): Promise<any> {
-    var params = {
-      Bucket: 'bucket', 
+    let params = {
+      Bucket: this.bucket, 
       Key: key,
     };
     try {
-      await this.s3Client.getObject(params);
-      return 'successful';
+      const res = await this.s3Client.getObject(params).promise();
+      return res.Body.toString();
     } catch (error) {
-      return 'error';
+      return error.toString();
     }
   };
 
-  sendSMS(phoneNumber:string,message:string): void {
-    this.snsClient.publish({
-        Message: message,
-        PhoneNumber: phoneNumber,
-    }, function(err, data) {
-        if (err) {
-          return console.log(err);
-        }
-        return console.log(data);
-    });
+  async sendSMS(phoneNumber:string,message:string): Promise<any> {
+    let params = {
+      Message: message,
+      PhoneNumber: phoneNumber,
+  };
+    try {
+      const res = await this.snsClient.publish(params).promise();
+      return res.MessageId;
+    } catch (error) {
+      return error.toString();
+    }
   }
 
-  sendEmail(message:string,subject:string): void {
-    this.sesClient.sendEmail({
+  async sendEmail(message:string,subject:string): Promise<any> {
+    let params = {
         Source: 'albert@dreamcode.io',
         Destination: {
             ToAddresses: [
@@ -71,15 +73,16 @@ export class AppService {
             },
             Subject: {
                 Data: subject,
-            },
+                },
+            }
+        };
+        try {
+          const res = await this.sesClient.sendEmail(params).promise();
+          return res.MessageId;
+        } catch (error) {
+          return error.toString();
         }
-    }, function(err, data) {
-        if (err) {
-            return console.log(err, err.stack);
-        }
-        return console.log(data);
-    });
-  }
+    }
 }
 
     

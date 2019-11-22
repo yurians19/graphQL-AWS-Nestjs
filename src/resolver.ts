@@ -18,7 +18,7 @@ export default class appResolver {
     }
 
     @Mutation('sendSMS')
-    async sendSMS(@Args('key') key:string, @Args('body') body:string): Promise<any> {
+    async sendSMS(@Args('phoneNumber') key:string, @Args('message') body:string): Promise<any> {
         return this.appService.sendSMS(key,body)
     }
 

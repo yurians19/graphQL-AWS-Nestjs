@@ -5,11 +5,12 @@ import appResolver from './resolver';
 
 @Module({
   imports: [GraphQLModule.forRoot({
-    typePaths: ['./*.gql'],
+    typePaths: ['./**/*.gql'],
       definitions: {
         path: './src/schema.ts',
         outputAs: 'class',
       },
+      playground: true,
   })],
   providers: [AppService,appResolver],
 })
