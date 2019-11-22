@@ -1,0 +1,12 @@
+type Query {
+    getObjectS3(key:String):String
+}
+type Mutation {
+    uploadS3(key:String,body:String):String,
+    sendSMS(key:String,body:String):String,
+    sendEmail(key:String,body:String):String,
+}
+schema {
+  query: Query
+  mutation: Mutation
+}
